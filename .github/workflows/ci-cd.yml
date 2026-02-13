@@ -80,7 +80,7 @@ jobs:
 
           podman rm -f usersapp 2>/dev/null || true
 
-          # контейнер слушает 8008, на хосте открываем порт из секрета
+          # контейнер слушает 8093, на хосте открываем порт из секрета
           podman run -d --name usersapp --network host \
             -e DATABASE_URL="postgresql+psycopg://kubsu:kubsu@127.0.0.1:5432/kubsu" \
             -e ROOT_PATH="/${{ secrets.USERNAME }}" \
