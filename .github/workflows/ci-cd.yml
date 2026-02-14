@@ -43,8 +43,6 @@ jobs:
           POSTGRES_USER: kubsu
           POSTGRES_PASSWORD: kubsu
           POSTGRES_DB: kubsu
-        ports:
-          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U kubsu -d kubsu"
           --health-interval 2s
@@ -58,11 +56,19 @@ jobs:
       - name: Pull TEST image
         run: docker pull "${IMAGE}:test-${{ github.sha }}"
 
+      - name: Get service network
+        id: net
+        run: |
+          NETWORK=$(docker inspect db \
+            --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}')
+          echo "NETWORK=$NETWORK" >> $GITHUB_OUTPUT
+
       - name: Run tests inside built image
         run: |
           set -e
-          docker run --rm --network host \
-            -e DATABASE_URL="postgresql+psycopg://kubsu:kubsu@127.0.0.1:5432/kubsu" \
+          docker run --rm \
+            --network "${{ steps.net.outputs.NETWORK }}" \
+            -e DATABASE_URL="postgresql+psycopg://kubsu:kubsu@db:5432/kubsu" \
             -e ROOT_PATH="" \
             "${IMAGE}:test-${{ github.sha }}"
 

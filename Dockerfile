@@ -31,7 +31,7 @@ EXPOSE 8093
 USER appuser
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8093"]
 
-# ---------- test stage (тесты запускаются внутри собранного image) -----
+# ---------- test stage (тесты запускаются внутри собранного image) ----
 FROM prod AS test
 USER root
 COPY --from=builder /wheels-test /wheels-test
